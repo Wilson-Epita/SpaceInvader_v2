@@ -1,13 +1,18 @@
+import java.util.Random;
+
 public class Enemy extends DefaultCriter
 {
     // Attributs
-    private double  speedX, speedY;
-    private double  downDistance;
-    private int     direction;
-    private boolean touchWall;
+    private double      speedX, speedY;
+    private double      downDistance;
+    private int         direction;
+    private boolean     touchWall;
+    private Missile[]   missiles;
+    private Shooter     shooter;
 
     // Constructor
-    public Enemy(double x, double y, String imgPath, InvaderGameState gameState)
+    public Enemy(String imgPath, double x, double y, InvaderGameState gameState,
+        Shooter shooter)
     {
         /* Constructor of shooter
 
@@ -21,7 +26,11 @@ public class Enemy extends DefaultCriter
             An instance of Shooter.
         */
         super (imgPath, x, y, gameState);
+        this.shooter = shooter;
+        missiles = Missile.initMissiles(3, Criter.enemyMissilePath,
+            0, 0, -3, gameState);
         this.downDistance = 0;
+        this.touchWall = false;
         this.speedX = 2;
         this.speedY = -3;
         this.direction = 1; // 1: right, -1: left
@@ -91,6 +100,30 @@ public class Enemy extends DefaultCriter
         x += speedX * direction;
     }
 
+    public void random_shot(double probaility)
+    {
+        /* Shot randomy depending of probaility.
+
+        # Argument :
+            probaility: float, probability that the enemy have to shot.
+
+        # Behaviour :
+            if Shot, add the missile in the missile liste.
+
+        */
+        boolean shot = (Math.random() <= probaility);
+
+        if (shot)
+        {
+            int i = 0;
+            while(i < missiles.length && missiles[i].isAlive())
+                i++;
+            if (i < missiles.length)
+                missiles[i].shot(x, y, 0);
+        }
+
+    }
+
     public void die()
     {
         /* Kill the enemy And Increase score. */
@@ -107,11 +140,13 @@ public class Enemy extends DefaultCriter
             moveY();
             draw();
         }
+        for(int i = 0; i < missiles.length; i++)
+            missiles[i].comportement(shooter);
     }
 
     // Static functions
     public static Enemy[][] initEnemys(int row, int col,
-        String imgPath, InvaderGameState gameState)
+        String imgPath, InvaderGameState gameState, Shooter shooter)
     {
         /* Create list of enemys.
 
@@ -125,7 +160,6 @@ public class Enemy extends DefaultCriter
         int		x;
         int     y;
         Enemy[][] res = new Enemy[row][col];
-
     	y = 730;
 
         for (int i = 0; i < row; i++)
@@ -133,12 +167,27 @@ public class Enemy extends DefaultCriter
             x = -365;
             for (int j = 0; j < col; j++)
             {
-                res[i][j] = new Enemy(x, y, imgPath,  gameState);
+                // New Enemy.
+                res[i][j] = new Enemy(imgPath, x, y,  gameState, shooter);
+                // Decal by width + 20 pixels.
                 x += (res[0][0].w + 20);
             }
             y -= (res[0][0].h + 10);
         }
 
+        return (res);
+    }
+
+    private static boolean noEnemyBelow(Enemy[][] enemys, int i, int j)
+    {
+        boolean res = true;
+        i++;
+
+        while (res && i < enemys.length)
+        {
+            res = !enemys[i][j].isAlive();
+            i++;
+        }
         return (res);
     }
 
@@ -161,16 +210,21 @@ public class Enemy extends DefaultCriter
             for(int j = 0; j < col; j++)
             {
                 enemys[i][j].comportement();
-                anyAlive |= enemys[i][j].isAlive;
-                changeDirection |= (enemys[i][j].touchWall);
+
+                if (enemys[i][j].isAlive)
+                {
+                    if (noEnemyBelow(enemys, i, j))
+                        enemys[i][j].random_shot(0.003);
+                    anyAlive = true;
+                    changeDirection |= (enemys[i][j].touchWall);
+                }
             }
         }
 
         // New wave if the past one die.
         if (!anyAlive)
-        {
             game.newWave();
-        }
+
 
         // Go down if any alien touch wall.
         if (changeDirection)
@@ -182,4 +236,5 @@ public class Enemy extends DefaultCriter
             }
         }
     }
+
 }

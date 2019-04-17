@@ -2,7 +2,12 @@ public interface Criter
 {
     /* Specify minimum API for in-game objects */
 
-    int screenSize = 800;
+    int screenSize          = 800;
+    String shooterPath      = "img/player_s.png";
+    String missilePath      = "img/laser.png";
+    String enemyPath        = "img/alien.png";
+    String enemyMissilePath = "img/laserRed1.png";
+    String backgroundPath   = "img/black_background.jpg";
 
     /* Display the Object with StdDraw */
     void draw();

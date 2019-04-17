@@ -4,11 +4,9 @@ public class Missile extends DefaultCriter
 {
     // Atributs
     private double  speed;
-    private double  theta;
-    private int     direction;
     // Constructor
-    public Missile(String imgPath, double x, double y, double theta,
-        int direction, InvaderGameState gameState)
+    public Missile(String imgPath, double x, double y,
+        double speed, InvaderGameState gameState)
     {
         /* Constructor of shooter
 
@@ -18,7 +16,6 @@ public class Missile extends DefaultCriter
             y:          double, position on Y axis.
             theta:      rotation of the missile.
             gameState:  InvaderGameState, instance of game state.
-            direction:  int, 1: go down, -1: go up.
 
         # Returns:
             An instance of Missile.
@@ -26,9 +23,7 @@ public class Missile extends DefaultCriter
         super(imgPath, x, y, gameState);
 
         this.isAlive = false;
-        this.speed = 20;
-        this.theta = theta;
-        this.direction = direction;
+        this.speed = speed;
     }
 
     private void move()
@@ -43,16 +38,16 @@ public class Missile extends DefaultCriter
         # Returns
             Modify this.x and this.y.
         */
-        // double angle = Math.toRadians(theta);
-        x += direction * speed * Math.sin(theta);
-        y += direction * speed * Math.cos(theta);
+        double theta = Math.toRadians(rotation);
+        x += speed * -Math.sin(theta);
+        y += speed * Math.cos(theta);
     }
 
-    public void shot(double x, double y, double theta)
+    public void shot(double x, double y, double rotation)
     {
         this.x = x;
         this.y = y;
-        this.theta = theta;
+        this.rotation = rotation;
         isAlive = true;
     }
 
@@ -131,27 +126,36 @@ public class Missile extends DefaultCriter
             this.maxPos: double, Position of Wall.
             Criter.screenSize:  int, size of screen.
         */
-        if(x > maxPos || x < -maxPos || y > Criter.screenSize)
+        if(x > maxPos || x < -maxPos || y > Criter.screenSize || y < 0)
             die();
     }
 
-    public void comportement(Shooter shooter, Enemy[][] enemys)
+    public void comportement(Shooter shooter)
     {
         if(isAlive)
         {
             move();
-            if(direction == -1)
-                collideShooter(shooter);
-            else
-                collideEnemys(enemys);
+            collideShooter(shooter);
             checkBorder();
             draw();
         }
     }
 
+    public void comportement(Enemy[][] enemys)
+    {
+        if(isAlive)
+        {
+            move();
+            collideEnemys(enemys);
+            checkBorder();
+            draw();
+        }
+    }
+
+
     // Static functions
     public static Missile[] initMissiles(int length, String imgPath, double x,
-        double y, double theta, int direction, InvaderGameState gameState)
+        double y, double speed, InvaderGameState gameState)
     {
         /* Initialise a new missile  array
 
@@ -167,7 +171,7 @@ public class Missile extends DefaultCriter
 
         Missile[] missiles = new Missile[length];
         for(int i = 0; i < length; i++)
-            missiles[i] = new Missile(imgPath, x, y, theta, direction,
+            missiles[i] = new Missile(imgPath, x, y, speed,
                 gameState);
         return missiles;
     }

@@ -7,6 +7,7 @@ public abstract class DefaultCriter implements Criter
     public  double maxPos;
     public  boolean isAlive;
     public  InvaderGameState gameState;
+    public  double  rotation;
 
     // Costructors
 
@@ -33,6 +34,7 @@ public abstract class DefaultCriter implements Criter
         this.y = y;
         this.dX = 0;
         this.dY = 0;
+        this.rotation = 0;
         this.maxPos = (Criter.screenSize / 2) - (int)(0.5 * w);
         this.isAlive = true;
         this.gameState = gameState;
@@ -50,7 +52,7 @@ public abstract class DefaultCriter implements Criter
         # Returns:
             Draw the Player.
         */
-        StdDraw.picture(x, y, imgPath);
+        StdDraw.picture(x, y, imgPath, rotation);
     }
 
     // Getters

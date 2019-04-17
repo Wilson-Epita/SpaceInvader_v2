@@ -30,27 +30,28 @@ public class InvaderGameState
             this.shooter instance.
             this.enemys 2D Array;
         */
-        shooter = new Shooter("img/player_s.png", this);
-        enemys = Enemy.initEnemys(4, 6, "img/alien.png", this);
+        shooter = new Shooter(Criter.shooterPath, this);
+        enemys = Enemy.initEnemys(4, 6, Criter.enemyPath, this, shooter);
         shooter.setEnemys(enemys);
     }
 
     public void newWave()
     {
-        enemys = Enemy.initEnemys(4, 6, "img/alien.png", this);
+        enemys = Enemy.initEnemys(4, 6, Criter.enemyPath, this, shooter);
         shooter.setEnemys(enemys);
     }
 
     public void game()
     {
         /* Game loop */
-        while (!isOver)
+        while (shooter.isAlive())
         {
             StdDraw.clear();
-            StdDraw.picture(0, 400, "img/black_background.jpg");
+            StdDraw.picture(0, 400, Criter.backgroundPath);
             shooter.comportement();
             Enemy.enemysComportement(enemys, this, 4, 6);
             StdDraw.show(10);
+            System.out.println(score);
         }
     }
     public void increaseScore()
