@@ -8,7 +8,7 @@ public abstract class DefaultCriter implements Criter
     public  boolean isAlive;
     public  InvaderGameState gameState;
     public  double  rotation;
-
+    public  int     lives;
     // Costructors
 
     public DefaultCriter(String imgPath, double x, double y,
@@ -34,6 +34,7 @@ public abstract class DefaultCriter implements Criter
         this.y = y;
         this.dX = 0;
         this.dY = 0;
+        this.lives = 1;
         this.rotation = 0;
         this.maxPos = (Criter.screenSize / 2) - (int)(0.5 * w);
         this.isAlive = true;
@@ -71,7 +72,9 @@ public abstract class DefaultCriter implements Criter
     // Collison
     public void collide()
     {
-        die();
+        lives--;
+        if (lives <= 0)
+            die();
     }
 
     // Call in each frame.

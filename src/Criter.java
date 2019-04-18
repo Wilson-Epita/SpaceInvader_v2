@@ -5,7 +5,9 @@ public interface Criter
     int screenSize          = 800;
     String shooterPath      = "img/player_s.png";
     String missilePath      = "img/laser.png";
-    String enemyPath        = "img/alien.png";
+    String enemyPath1       = "img/alien1.png";
+    String enemyPath2       = "img/alien2.png";
+    String enemyPath3       = "img/alien3.png";
     String enemyMissilePath = "img/laserRed1.png";
     String backgroundPath   = "img/black_background.jpg";
 

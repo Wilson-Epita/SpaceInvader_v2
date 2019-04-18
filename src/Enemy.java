@@ -11,8 +11,8 @@ public class Enemy extends DefaultCriter
     private Shooter     shooter;
 
     // Constructor
-    public Enemy(String imgPath, double x, double y, InvaderGameState gameState,
-        Shooter shooter)
+    public Enemy(String imgPath, double x, double y, int lives,
+        InvaderGameState gameState, Shooter shooter)
     {
         /* Constructor of shooter
 
@@ -25,14 +25,16 @@ public class Enemy extends DefaultCriter
         # Returns
             An instance of Shooter.
         */
+
         super (imgPath, x, y, gameState);
         this.shooter = shooter;
-        missiles = Missile.initMissiles(3, Criter.enemyMissilePath,
+        missiles = Missile.initMissiles(10, Criter.enemyMissilePath,
             0, 0, -3, gameState);
         this.downDistance = 0;
         this.touchWall = false;
         this.speedX = 2;
         this.speedY = -3;
+        this.lives = lives;
         this.direction = 1; // 1: right, -1: left
     }
 
@@ -124,6 +126,27 @@ public class Enemy extends DefaultCriter
 
     }
 
+    // Draw function
+    public void draw()
+    {
+        /* Display the player with StdDraw
+
+        # Arguments:
+            this.x:         double, position on x axis.
+            this.y:         double, position on y axis.
+            this.imgPath:   String, path tom image.
+
+        # Returns:
+            Draw the Player.
+        */
+        if(lives == 1)
+            StdDraw.picture(x, y, Criter.enemyPath1);
+        else if(lives == 2)
+            StdDraw.picture(x, y, Criter.enemyPath2);
+        else
+            StdDraw.picture(x, y, Criter.enemyPath3);
+    }
+
     public void die()
     {
         /* Kill the enemy And Increase score. */
@@ -145,7 +168,7 @@ public class Enemy extends DefaultCriter
     }
 
     // Static functions
-    public static Enemy[][] initEnemys(int row, int col,
+    public static Enemy[][] initEnemys(int row, int col, int lives,
         String imgPath, InvaderGameState gameState, Shooter shooter)
     {
         /* Create list of enemys.
@@ -168,7 +191,7 @@ public class Enemy extends DefaultCriter
             for (int j = 0; j < col; j++)
             {
                 // New Enemy.
-                res[i][j] = new Enemy(imgPath, x, y,  gameState, shooter);
+                res[i][j] = new Enemy(imgPath, x, y, lives, gameState, shooter);
                 // Decal by width + 20 pixels.
                 x += (res[0][0].w + 20);
             }
@@ -213,8 +236,15 @@ public class Enemy extends DefaultCriter
 
                 if (enemys[i][j].isAlive)
                 {
+                    if (enemys[i][j].getY() < 100)
+                        game.over();
                     if (noEnemyBelow(enemys, i, j))
-                        enemys[i][j].random_shot(0.003);
+                    {
+                        double probability = 0.003 + (0.0005 * game.getLevel());
+                         if (probability > 0.2)
+                            probability = 0.2;
+                        enemys[i][j].random_shot(probability);
+                    }
                     anyAlive = true;
                     changeDirection |= (enemys[i][j].touchWall);
                 }

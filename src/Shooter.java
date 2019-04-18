@@ -31,6 +31,7 @@ public class Shooter extends DefaultCriter
         this.deceleration = 0.3;
         this.isMoving = false;
         this.spaceRealeased = true;
+        this.lives = 3;
     }
 
     // Setters.
